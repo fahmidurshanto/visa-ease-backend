@@ -44,10 +44,15 @@ async function run() {
       console.log(users);
       res.send(users)
     })
-
+    // all-visa get request
+    app.get("/all-visa", async (req, res) =>{
+      const visas = await client.db("visa-ease").collection("all-visa").find().toArray();
+      res.send(visas)
+    })
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     })
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
