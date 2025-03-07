@@ -49,6 +49,14 @@ async function run() {
       const visas = await client.db("visa-ease").collection("all-visa").find().toArray();
       res.send(visas)
     })
+
+    // added-visa post request
+    app.post("/all-visa", async (req, res) =>{
+      const newVisa = req.body;
+      const result = await client.db("visa-ease").collection("all-visa").insertOne(newVisa);
+      res.send(result)
+    })
+
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     })
