@@ -51,11 +51,18 @@ async function run() {
     })
 
     // added-visa post request
-    app.post("/all-visa", async (req, res) =>{
+    app.post("/added-visa", async (req, res) =>{
       const newVisa = req.body;
       console.log(newVisa);
-      const result = await client.db("visa-ease").collection("all-visa").insertOne(newVisa);
+      const result = await client.db("visa-ease").collection("added-visa").insertOne(newVisa);
       res.send(result)
+    })
+
+    // added visa get request
+    app.get("/added-visa", async (req, res) =>{
+      console.log(req.body);
+      const visas = await client.db("visa-ease").collection("added-visa").find().toArray();
+      res.send(visas)
     })
 
     app.get('/all-visa/:id', async (req, res) => {
