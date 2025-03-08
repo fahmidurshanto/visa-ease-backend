@@ -3,7 +3,7 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.p5ldir2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -33,7 +33,7 @@ async function run() {
     // users post request
     app.post("/users", async (req, res) =>{
       const newUser = req.body;
-      const result = await client.db("visa-ease").collection("users").insertOne (newUser)
+      const result = await client.db("visa-ease").collection("users").insertOne(newUser)
       console.log("Got new user", newUser);
       res.send(result);
     })
@@ -53,9 +53,17 @@ async function run() {
     // added-visa post request
     app.post("/all-visa", async (req, res) =>{
       const newVisa = req.body;
+      console.log(newVisa);
       const result = await client.db("visa-ease").collection("all-visa").insertOne(newVisa);
       res.send(result)
     })
+
+    app.get('/all-visa/:id', async (req, res) => {
+      const id = req.params.id; // Access the dynamic id from the route parameter
+      console.log(id);
+      const visa = await client.db("visa-ease").collection("all-visa").findOne({ _id: new ObjectId(id) });
+      res.send(visa);
+  });
 
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
