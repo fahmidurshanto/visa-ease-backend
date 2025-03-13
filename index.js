@@ -7,19 +7,17 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.p5ldir2.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-
 const client = new MongoClient(uri, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    }
-  });
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
+});
 
 // middleware
 app.use(express.json());
 app.use(cors());
-
 
 async function run() {
   try {
@@ -29,82 +27,121 @@ async function run() {
       res.send("Welcome to Visa Ease Server!");
     });
 
-
     // users post request
-    app.post("/users", async (req, res) =>{
+    app.post("/users", async (req, res) => {
       const newUser = req.body;
-      console.log(newUser)
-      const result = await client.db("visa-ease").collection("users").insertOne(newUser)
+      console.log(newUser);
+      const result = await client
+        .db("visa-ease")
+        .collection("users")
+        .insertOne(newUser);
       console.log("Got new user", newUser);
       res.send(result);
-    })
+    });
 
-    // users get request 
-    app.get("/users", async (req, res) =>{
-      const users = await client.db("visa-ease").collection("users").find().toArray();
-      console.log(users);
-      res.send(users)
-    })
+    // users get request
+    app.get("/users", async (req, res) => {
+      const users = await client
+        .db("visa-ease")
+        .collection("users")
+        .find()
+        .toArray();
+      res.send(users);
+    });
     // all-visa get request
-    app.get("/all-visa", async (req, res) =>{
-      const visas = await client.db("visa-ease").collection("all-visa").find().toArray();
-      res.send(visas)
-    })
-
-   
+    app.get("/all-visa", async (req, res) => {
+      const visas = await client
+        .db("visa-ease")
+        .collection("all-visa")
+        .find()
+        .toArray();
+      res.send(visas);
+    });
 
     // added-visa post request
-    app.post("/added-visa", async (req, res) =>{
+    app.post("/added-visa", async (req, res) => {
       const newVisa = req.body;
-      console.log(newVisa);
-      const result = await client.db("visa-ease").collection("added-visa").insertOne(newVisa);
-      res.send(result)
-    })
 
-    app.get('/all-visa/:id', async (req, res) => {
+      const result = await client
+        .db("visa-ease")
+        .collection("added-visa")
+        .insertOne(newVisa);
+      res.send(result);
+    });
+
+    app.get("/all-visa/:id", async (req, res) => {
       const id = req.params.id; // Access the dynamic id from the route parameter
-      console.log(id);
-      const visa = await client.db("visa-ease").collection("all-visa").findOne({ _id: new ObjectId(id) });
+      const visa = await client
+        .db("visa-ease")
+        .collection("all-visa")
+        .findOne({ _id: new ObjectId(id) });
       res.send(visa);
-  });
+    });
 
-   // added visa get request
-   app.get("/added-visa", async (req, res) =>{
-    console.log(req.body);
-    const visas = await client.db("visa-ease").collection("added-visa").find().toArray();
-    res.send(visas)
-  })
+    // added visa get request
+    app.get("/added-visa", async (req, res) => {
+      console.log(req.body);
+      const visas = await client
+        .db("visa-ease")
+        .collection("added-visa")
+        .find()
+        .toArray();
+      res.send(visas);
+    });
 
-  // PUT request to update a visa by ID
-app.put("/added-visa/:id", async(req, res) =>{
-  const id = req.params.id;
-  const updatedVisa = req.body;
-  const result = await client.db("visa-ease").collection("added-visa").updateOne({_id: new ObjectId(id)}, {$set: updatedVisa}, {upsert: true});
-  console.log(result)
-})
+    // PUT request to update a visa by ID
+    app.put("/added-visa/:id", async (req, res) => {
 
-// DELETE request to delete a visa by ID
-app.delete('/added-visa/:id', async (req, res) => {
-  const { id } = req.params; // Get the visa ID from the URL
+      // console.log(req.params.id)
+      const id = req.params.id;
 
-  const result = await client.db("visa-ease").collection('added-visa').deleteOne({ _id: new ObjectId(id) });
-  res.send(result);
-})
 
+      const {countryImage,countryName,visaType,processingTime,requiredDocuments,description,ageRestriction,fee,validity,applicationMethod} = req.body;
+
+      const filter = { _id: new ObjectId(id) };
+
+      const updatedVisa = {countryImage,countryName,visaType,processingTime,requiredDocuments,description,ageRestriction,fee,validity,applicationMethod} 
+
+// console.log(updatedVisa)
+      // Update the document
+      const result = await client
+        .db("visa-ease")
+        .collection("added-visa")
+        .updateOne(filter, { $set: updatedVisa }, { upsert: true });
+
+console.log(result)
+
+      // Fetch the updated document to return
+      const updatedDocument = await client
+        .db("visa-ease")
+        .collection("added-visa")
+        .findOne(filter);
+      res.send(updatedDocument);
+    });
+
+    // DELETE request to delete a visa by ID
+    app.delete("/added-visa/:id", async (req, res) => {
+      const { id } = req.params; // Get the visa ID from the URL
+
+      const result = await client
+        .db("visa-ease")
+        .collection("added-visa")
+        .deleteOne({ _id: new ObjectId(id) });
+      res.send(result);
+    });
 
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
-    })
-
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
   }
 }
 run().catch(console.dir);
-
-
