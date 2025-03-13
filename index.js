@@ -33,6 +33,7 @@ async function run() {
     // users post request
     app.post("/users", async (req, res) =>{
       const newUser = req.body;
+      console.log(newUser)
       const result = await client.db("visa-ease").collection("users").insertOne(newUser)
       console.log("Got new user", newUser);
       res.send(result);
@@ -50,6 +51,8 @@ async function run() {
       res.send(visas)
     })
 
+   
+
     // added-visa post request
     app.post("/added-visa", async (req, res) =>{
       const newVisa = req.body;
@@ -58,19 +61,36 @@ async function run() {
       res.send(result)
     })
 
-    // added visa get request
-    app.get("/added-visa", async (req, res) =>{
-      console.log(req.body);
-      const visas = await client.db("visa-ease").collection("added-visa").find().toArray();
-      res.send(visas)
-    })
-
     app.get('/all-visa/:id', async (req, res) => {
       const id = req.params.id; // Access the dynamic id from the route parameter
       console.log(id);
       const visa = await client.db("visa-ease").collection("all-visa").findOne({ _id: new ObjectId(id) });
       res.send(visa);
   });
+
+   // added visa get request
+   app.get("/added-visa", async (req, res) =>{
+    console.log(req.body);
+    const visas = await client.db("visa-ease").collection("added-visa").find().toArray();
+    res.send(visas)
+  })
+
+  // PUT request to update a visa by ID
+app.put("/added-visa/:id", async(req, res) =>{
+  const id = req.params.id;
+  const updatedVisa = req.body;
+  const result = await client.db("visa-ease").collection("added-visa").updateOne({_id: new ObjectId(id)}, {$set: updatedVisa}, {upsert: true});
+  console.log(result)
+})
+
+// DELETE request to delete a visa by ID
+app.delete('/added-visa/:id', async (req, res) => {
+  const { id } = req.params; // Get the visa ID from the URL
+
+  const result = await client.db("visa-ease").collection('added-visa').deleteOne({ _id: new ObjectId(id) });
+  res.send(result);
+})
+
 
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
