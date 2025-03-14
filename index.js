@@ -70,7 +70,7 @@ async function run() {
     });
 
     app.get("/all-visa/:id", async (req, res) => {
-      const id = req.params.id; // Access the dynamic id from the route parameter
+      const id = req.params.id;
       const visa = await client
         .db("visa-ease")
         .collection("all-visa")
@@ -88,6 +88,14 @@ async function run() {
         .toArray();
       res.send(visas);
     });
+    
+    app.post("/added-visa/:id", async (req, res) =>{
+      const id = req.params;
+      const visa = req.body;
+      const result = await client.db('visa-ease').collection("added-visa").insertOne(visa);
+      console.log(result)
+      res.send(result)
+    })
 
     // PUT request to update a visa by ID
     app.put("/added-visa/:id", async (req, res) => {
@@ -120,15 +128,12 @@ console.log(result)
     });
 
     // DELETE request to delete a visa by ID
-    app.delete("/added-visa/:id", async (req, res) => {
-      const { id } = req.params; // Get the visa ID from the URL
-
-      const result = await client
-        .db("visa-ease")
-        .collection("added-visa")
-        .deleteOne({ _id: new ObjectId(id) });
-      res.send(result);
-    });
+    app.delete("/added-visa/:id", async (req, res) =>{
+      console.log(req.params.id)
+      const id = req.params.id;
+      const result = client.db("visa-ease").collection("added-visa").deleteOne({_id: new ObjectId(id)})
+      res.send(result)
+    })
 
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
