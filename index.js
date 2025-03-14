@@ -61,6 +61,7 @@ async function run() {
     // added-visa post request
     app.post("/added-visa", async (req, res) => {
       const newVisa = req.body;
+      console.log(newVisa)
 
       const result = await client
         .db("visa-ease")
@@ -95,6 +96,21 @@ async function run() {
       const result = await client.db('visa-ease').collection("added-visa").insertOne(visa);
       console.log(result)
       res.send(result)
+    })
+
+    app.post("/applied-visa/:id", async(req, res) =>{
+      const id = req.params.id;
+      const appliedVisa = req.body;
+      console.log(appliedVisa)
+      const result = await client.db('visa-ease').collection("applied-visa").insertOne(appliedVisa);
+      res.send(result)
+    })
+
+    app.get("/applied-visa", async(req, res) =>{
+      console.log(req.body);
+      const appliedVisa = await client.db('visa-ease').collection("applied-visa").find().toArray();
+      console.log(appliedVisa)
+      res.send(appliedVisa)
     })
 
     // PUT request to update a visa by ID
