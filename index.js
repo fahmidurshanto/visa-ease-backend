@@ -17,7 +17,9 @@ const client = new MongoClient(uri, {
 
 // middleware
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'https://visa-ease.vercel.app',
+}));
 
 async function run() {
   try {
