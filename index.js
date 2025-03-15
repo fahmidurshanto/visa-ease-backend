@@ -20,7 +20,8 @@ app.use(express.json());
 app.use(cors({origin: [
   'https://visa-ease.vercel.app',
   'http://localhost:3000',
-  'https://visa-ease-47fe7.web.app'
+  'https://visa-ease-47fe7.web.app',
+  'https://frabjous-narwhal-2e78d6.netlify.app/'
 ]}))
 
 async function run() {
