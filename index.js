@@ -113,6 +113,13 @@ async function run() {
       res.send(appliedVisa)
     })
 
+    app.delete("/applied-visa/:id", async(req, res) =>{
+      const id = req.params.id;
+      const result = await client.db('visa-ease').collection("applied-visa").deleteOne({_id: new ObjectId(id)})
+      console.log(result)
+      res.send(result)
+    })
+
     // PUT request to update a visa by ID
     app.put("/added-visa/:id", async (req, res) => {
 
